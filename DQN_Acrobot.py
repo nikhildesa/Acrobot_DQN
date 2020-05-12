@@ -31,7 +31,7 @@ number_of_episodes = 500
 number_of_actions = 3
 
 
-#<-------------------- Epsilon Greedy---------------->
+#<-------------------- Epsilon Greedy stratergy---------------->
     
 class Epsilon_Greedy_Stratergy():
     def learning_rate(self,step):
