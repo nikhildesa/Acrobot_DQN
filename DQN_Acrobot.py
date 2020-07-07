@@ -43,7 +43,6 @@ class Epsilon_Greedy_Stratergy():
             math.exp(-1. * step * decrease)
 
 
-
 #<-------------------Experience ------------->
         
 Instances = namedtuple('Instances',('state', 'action', 'next_state', 'reward') # subclass and fields
@@ -364,4 +363,5 @@ for i in range(number_of_episodes):
     
     
         
+    
     
