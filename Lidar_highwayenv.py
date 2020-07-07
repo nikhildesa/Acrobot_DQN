@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-Created on Sat Jul  4 00:27:08 2020
+Created on Tue Jul  7 11:56:25 2020
 
-@author: nikhil desai
+@author: nikhi
 """
-
 
 """
 checks
@@ -13,9 +12,14 @@ efficiency issue : Tries all side to detect, need to check only two side.
 For loop : goes inside each endpoint --> each obstacle ---> checks all side 
 """
 
+import time
+start_time = time.time()
+
+
 #comparing equation with all sides of rectangle
 import math
 from sklearn.metrics.pairwise import euclidean_distances
+import scipy
 import gym
 import highway_env
 import numpy as np
@@ -91,9 +95,6 @@ distance = [] # To store the length of all rays
 #<-----------------------------From the points make rectangle-------------------------->
 
 
-# dry check
-
-center = (4,5)
 
 
 
@@ -114,20 +115,20 @@ for i in range(len(kinematics)):
     car_x_top_left = x - 2.5
     car_y_top_left = y + 1
     
-    #rectangle = [[car_x_bottom_left,car_y_bottom_left],[car_x_bottom_right,car_y_bottom_right],[car_x_top_right,car_y_top_right],[car_x_top_left,car_y_top_left]]
+    rectangle = [[car_x_bottom_left,car_y_bottom_left],[car_x_bottom_right,car_y_bottom_right],[car_x_top_right,car_y_top_right],[car_x_top_left,car_y_top_left]]
     
-    #all_cars.append(rectangle)  # all_cars has points of all cars
-    
-    all_cars = [[[6,1],[12,1],[12,2],[6,2]]]
+    all_cars.append(rectangle)  # all_cars has points of all cars
+ 
     
 #<------------------------------Draw circle points-------------------------------------->
     
 
 
 rad = 10
-deviation_angle = 45
+start = 0
+deviation_angle = 5
 end_angle = 360
-for i in range(0,end_angle,deviation_angle):                    # 45 degree deviation (can be changed)
+for i in range(start,end_angle,deviation_angle):                    # 45 degree deviation (can be changed)
     x_line.append(rad * math.cos(math.radians(i)) + center[0])
     y_line.append(rad * math.sin(math.radians(i)) + center[1])
 
@@ -158,59 +159,52 @@ for endpoint in endpoints:
         for side in sides_of_rectangle[i]:
             R = intersection(L,side)
             if R:
-                if(endpoint == (11.071067811865474, -2.0710678118654773)):
-                    print(R)
-                    if(R[0] >= all_cars[i][0][0] and R[0] <= all_cars[i][2][0] and R[1] >= all_cars[i][0][1] and R[1] <= all_cars[i][2][1] and np.linalg.norm(R) < np.linalg.norm(endpoint)):
-                        print('hi')
-                        if(np.linalg.norm(np.array(R)-np.array(endpoint)) < rad):  # checks if they lie in same quadrant
-                            intersect.append(R)
+                if(R[0] >= all_cars[i][0][0] and R[0] <= all_cars[i][2][0] and R[1] >= all_cars[i][0][1] and R[1] <= all_cars[i][2][1] and np.linalg.norm(R) < np.linalg.norm(endpoint)):
+                    if(np.linalg.norm(np.array(R)-np.array(endpoint)) < rad):  # checks if they lie in same quadrant
+                        intersect.append(R)
 
     if len(intersect) > 1:
+     
+        #smallest_point = min(intersect, key=lambda c : scipy.spatial.distance.euclidean(c, center))
+        
         dist = np.empty([len(intersect),3])
         dist[:,0:2] = np.array([intersect])
         dist[:,2] = euclidean_distances(np.array([center]),dist[:,0:2])
         row = dist[:,2].argmin()
         smallest_point = tuple(dist[row,0:2])
-        #print(intersect)
-        #print('first if')
-
+        
+        
     if(len(intersect) == 1):
         smallest_point = intersect[0]
-        #print('second if')
-
+        
     if(len(intersect) == 0):
         smallest_point = endpoint
-        #print('third if')
-
+        
     distance.append(smallest_point)
 
-#print(distance)
+
 
 
 # find distance from each point in list distance and center, store it in a form of dictionary.
 distance = np.array(distance)
 
+lidar = np.zeros([len(distance),5])
 
-#np.concatenate((k, distance))
+lidar[:,0:2] = distance
 
-
-
-
-
+lidar[:,3] = np.linalg.norm(np.array(center) - lidar[:,0:2])
 
 
 
 
 
+lidar = scipy.spatial.distance.cdist(np.array([center]), distance, 'euclidean')
+lidar.shape[1]
+lidar = np.reshape(lidar,(-1,1))
+
+degrees = np.arange(start,end_angle,deviation_angle)
+degrees = np.reshape(degrees,(-1,1))
+lidar = np.append(degrees,lidar,1)
 
 
-
-
-
-
-
-
-
-
-
-
+print("--- %s seconds ---" % (time.time() - start_time))
