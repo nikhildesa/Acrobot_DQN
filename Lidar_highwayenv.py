@@ -31,12 +31,12 @@ LENGTH = 5.0
 WIDTH = 2.0
     
 """
-
+from highway_env.envs.common.abstract import AbstractEnv
 config = {
     "observation": {
         "type": "Kinematics",
         "vehicles_count": 15,
-        "features": ["presence", "x", "y", "vx", "vy", "cos_h", "sin_h"],
+        "features": ["presence", "x", "y", "vx", "vy"],
         "features_range": {
             "x": [-100, 100],
             "y": [-100, 100],
@@ -45,7 +45,7 @@ config = {
         },
         "absolute": True,
         "order": "sorted",
-        #"normalized":True,
+        "normalize":False,
     }
 }
 
@@ -56,6 +56,7 @@ env.configure(config)                       # Update our configuration in the en
 obs = env.reset()
 
 obs = env.step(env.action_space.sample())
+env.render()
 kinematics = obs[0]               # kinematics = (row = vehicles)  x  (columns = presence,x,y,vx,vy,cosh,sinh)
 kinematics = kinematics[kinematics[:,0] == 1]  # consider only those vehicles whose presence is 1
 
@@ -124,7 +125,7 @@ for i in range(len(kinematics)):
     
 
 
-rad = 10
+rad = 5
 start = 0
 deviation_angle = 5
 end_angle = 360
@@ -208,3 +209,6 @@ lidar = np.append(degrees,lidar,1)
 
 
 print("--- %s seconds ---" % (time.time() - start_time))
+
+
+env.close()

@@ -161,7 +161,6 @@ for endpoint in endpoints:
                 if(endpoint == (11.071067811865474, -2.0710678118654773)):
                     print(R)
                     if(R[0] >= all_cars[i][0][0] and R[0] <= all_cars[i][2][0] and R[1] >= all_cars[i][0][1] and R[1] <= all_cars[i][2][1] and np.linalg.norm(R) < np.linalg.norm(endpoint)):
-                        print('hi')
                         if(np.linalg.norm(np.array(R)-np.array(endpoint)) < rad):  # checks if they lie in same quadrant
                             intersect.append(R)
 
